@@ -41,6 +41,7 @@ void imprimirLista(EventoTemporal* inicio) {
     EventoTemporal* actual = inicio;
     int contadorA = 0;
     int contadorB = 0;
+
     while (actual != nullptr) {
         std::cout << "Se ha presentado un evento de tipo: " << actual->evento << std::endl;
         std::cout << " " << actual->datos << " | " << actual->cientifico << " | " << actual->evento << std::endl;
@@ -63,6 +64,7 @@ int main() {
     srand(time(0));
     EventoTemporal* inicio = nullptr;
     EventoTemporal* anterior = nullptr;
+    EventoTemporal* singularidad = nullptr; // Nodo donde se ha producido una singularidad
 
     int tamanoLista = rand() % 20 + 3; // Tamaño mínimo de 3 nodos, máximo de 22 nodos
     for (int i = 0; i < tamanoLista; ++i) {
@@ -70,11 +72,13 @@ int main() {
         std::string cientifico;
         int datos = rand() % 100 + 1;
         int cientificoId = rand() % 2 + 1;
+
         if (cientificoId == 1) {
             cientifico = "Einstein";
         } else {
             cientifico = "Rosen";
         }
+
         if (anterior == nullptr) {
             evento = "A";
         } else {
@@ -90,6 +94,7 @@ int main() {
                 evento = "A";
             }
         }
+
         EventoTemporal* nuevoEvento = new EventoTemporal(anterior, nullptr, evento, cientifico, datos);
         if (anterior != nullptr) {
             anterior->PtrFuturo = nuevoEvento;
@@ -99,8 +104,24 @@ int main() {
             inicio = nuevoEvento;
         }
 
+        // Verificar si se ha producido una singularidad (Evento C)
+        if (nuevoEvento->esEventoC()) {
+            singularidad = nuevoEvento;
+        }
+
         // Imprimir eventos en cada iteración
         imprimirLista(inicio);
+
+        // Mostrar la secuencia de nodos que han producido la singularidad
+        if (singularidad != nullptr) {
+            std::cout << "Secuencia de nodos que han producido una singularidad:" << std::endl;
+            EventoTemporal* nodoSingularidad = singularidad;
+            while (nodoSingularidad != nullptr) {
+                std::cout << " | " << nodoSingularidad->evento << " | " << nodoSingularidad->datos << " | " << nodoSingularidad->cientifico << std::endl;
+                nodoSingularidad = nodoSingularidad->PtrPasado;
+            }
+            std::cout << std::endl;  // Agregar un salto de línea al final
+        }
     }
 
     // Liberar memoria de los nodos
